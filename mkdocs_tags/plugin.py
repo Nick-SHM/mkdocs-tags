@@ -19,7 +19,7 @@ class MkDocsTags(BasePlugin):
         """ Read tags and title info into `self.tags_and_pages` """
         config_copy = copy.deepcopy(config)
         config_copy['plugins'] = PluginCollection()
-        # Remove plugins in config. Otherwise, # `page_copy.read_source()` will
+        # Remove plugins in config. Otherwise, `page_copy.read_source()` will
         # call `on_page_read_source()` for each plugin
         for page in nav.pages:
             page_copy = copy.deepcopy(page)
