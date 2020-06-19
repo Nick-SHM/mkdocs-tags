@@ -16,7 +16,7 @@ pip install git+https://github.com/Nick-SHM/mkdocs-tags.git
 
 First, add `tags` to the `plugins` entry of `mkdocs.yml`.
 
-Note that if you previously omitted this entry, you'll likely want to enable plugin `search` as well. MkDocs enables it by default, but now you have to enable it explicitly as well. MkDocs enables it by default, but now you have to enable it explicitly.
+Note that if you have previously omitted this entry, you'll likely want to enable the plugin `search` as well. MkDocs enables it by default, but now you have to enable it explicitly.
 
 ```yaml
 plugins:
@@ -24,7 +24,7 @@ plugins:
     - tags
 ```
 
-Second, add a blank `tags.md` file in `docs/` and add it to the `nav` entry in `mkdocs.yml`. This file will be generated as a list of all tags and the pages under each of them. This page can also have tags, but the all the content in the file other than metadata and the title will be ignored. Customization options will be available in the future.
+Second, add a blank `tags.md` file in `docs/` and add it to the `nav` entry in `mkdocs.yml`. This file will be generated as a list of all tags with the pages under them. This page can also have tags, but the all the content in the file other than metadata and the title will be ignored. Customization options will be available in the future.
 
 ### Add Tags to Pages
 
