@@ -13,7 +13,7 @@ class MkDocsTags(BasePlugin):
     def __init__(self):
         self.tags_and_pages = {}
         # TODO: Customizable tags page path
-        self.tags_page_src_path = "tags.md"
+        self.tags_page_src_path = 'tags.md'
 
     def on_nav(self, nav, config, files):
         """ Read tags and title info into `self.tags_and_pages` """
@@ -24,18 +24,19 @@ class MkDocsTags(BasePlugin):
         for page in nav.pages:
             page_copy = copy.deepcopy(page)
             page_copy.read_source(config_copy)
-            if "tags" not in page_copy.meta:
+            if 'tags' not in page_copy.meta:
                 pass
-            elif not isinstance(page_copy.meta["tags"], list):
+            elif not isinstance(page_copy.meta['tags'], list):
                 pass
             else:
-                for tag in page_copy.meta["tags"]:
+                for tag in page_copy.meta['tags']:
                     if isinstance(tag, str):
                         if tag not in self.tags_and_pages:
                             self.tags_and_pages[tag] = []
-                        self.tags_and_pages[tag].append(
-                            {"title": page_copy.title,
-                             "src": page.file.src_path})
+                        self.tags_and_pages[tag].append({
+                            'title': page_copy.title,
+                            'src': page.file.src_path
+                        })
 
     def on_page_markdown(self, markdown, page, config, files):
         """ Generate on-page tags and the tags page"""
@@ -54,12 +55,12 @@ class MkDocsTags(BasePlugin):
         else:
             # TODO: Customizable on-page tags
             tag_str_list = ['\n---\n\nTags:']
-            if "tags" not in page.meta:
+            if 'tags' not in page.meta:
                 pass
-            elif not isinstance(page.meta["tags"], list):
+            elif not isinstance(page.meta['tags'], list):
                 pass
             else:
-                for tag in page.meta["tags"]:
+                for tag in page.meta['tags']:
                     if isinstance(tag, str):
                         tag_str_list.append(' **')
                         tag_str_list.append(tag)
