@@ -41,8 +41,7 @@ class MkDocsTags(BasePlugin):
     def on_page_markdown(self, markdown, page, config, files):
         """ Generate on-page tags and the tags page"""
         if page.file.src_path == self.tags_page_src_path:
-            # TODO: Customizable tags page template
-            jinja_template_str = """# Tags
+            jinja_tmplt_str = """# Tags
 {% for tag in tags_and_pages %}
 ## {{tag}}
 {% for page in tags_and_pages[tag] %}
@@ -50,21 +49,24 @@ class MkDocsTags(BasePlugin):
 {% endfor %}
 {% endfor %}
 """
-            jinja_template = Template(jinja_template_str)
-            return jinja_template.render(tags_and_pages=self.tags_and_pages)
+            jinja_tmplt = Template(jinja_tmplt_str)
+            return jinja_tmplt.render(tags_and_pages=self.tags_and_pages)
         else:
-            # TODO: Customizable on-page tags
-            tag_str_list = ['\n---\n\nTags:']
-            if 'tags' not in page.meta:
-                pass
-            elif not isinstance(page.meta['tags'], list):
-                pass
+            jinja_tmplt_str = """{{markdown}}
+{% if empty %}
+
+---
+
+Tags: **{{ tags | join('**, **') }}**
+
+{% endif %}
+"""
+            if 'tags' in page.meta and isinstance(page.meta['tags'], list):
+                jinja_tmplt = Template(jinja_tmplt_str)
+                return jinja_tmplt.render(
+                    tags=page.meta['tags'],
+                    markdown=markdown,
+                    empty=bool(page.meta['tags']),  # whether the list is empty
+                )
             else:
-                for tag in page.meta['tags']:
-                    if isinstance(tag, str):
-                        tag_str_list.append(' **')
-                        tag_str_list.append(tag)
-                        tag_str_list.append('**')
-                        tag_str_list.append(',')
-                tag_str_list[-1] = ''
-            return markdown + ''.join(tag_str_list)
+                return markdown
