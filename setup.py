@@ -9,7 +9,7 @@ def get_readme():
 
 setup(
     name='mkdocs-tags',
-    version='0.1',
+    version='0.2',
     description='Tags plugin for MkDocs',
     long_description=get_readme(),
     long_description_content_type='text/markdown',
