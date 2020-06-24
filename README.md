@@ -2,47 +2,57 @@
 
 A tags plugin for [MkDocs](https://www.mkdocs.org).
 
-## Getting Started
-
-### Installation
-
-With `pip`:
+## Installation
 
 ```bash
 pip install git+https://github.com/Nick-SHM/mkdocs-tags.git
 ```
 
-### Setting up
+Installation through [PyPI](https://pypi.org) will be available in the future.
 
-First, add `tags` to the `plugins` entry of `mkdocs.yml`.
+## Quick Start
 
-Note that if you have previously omitted this entry, you'll likely want to enable the plugin `search` as well. MkDocs enables it by default, but now you have to enable it explicitly.
+Create an MkDocs site:
+
+```bash
+mkdocs new demo
+```
+
+Add `tags` to the `plugins` entry of `mkdocs.yml`.
 
 ```yaml
+site_name: My Docs
+
 plugins:
     - search
     - tags
 ```
 
-Second, add a blank `tags.md` file in `docs/` and add it to the `nav` entry in `mkdocs.yml`. This file will be generated as a list of all tags with the pages under them. This page can also have tags, but the all the content in the file other than metadata and the title will be ignored. Customization options will be available in the future.
+_Note that if you have previously omitted this entry, you'll likely want to enable the plugin `search` as well. MkDocs enables it by default, but now you have to enable it explicitly._
 
-### Add Tags to Pages
+Add tags to a page as a list in the `tags` entry of the [metadata section](https://www.mkdocs.org/user-guide/writing-your-docs/#meta-data). For example, change `index.md` to:
 
-Add tags as a list to the `tags` entry in the [metadata section](https://www.mkdocs.org/user-guide/writing-your-docs/#meta-data) of the page.
-
-```markdown
+```
 ---
 tags:
-    - tag1
-    - tag2
+  - tag1
+  - tag2
 ---
 
-# Title
-
-content
+# Index
 ```
 
-Tags will be rendered on the bottom of the page. Customization options will be available in the future.
+Then a list of tags will be generated at the bottom of the page, if the page contains at least one tag.
+
+![On-page tag list](img/demo-index.png)
+
+Create `tags.md` in `docs/`. This file will contain a list of all tags and the pages under each of them.
+
+![Tags page](img/demo-tags-page.png)
+
+You can add this page to an arbitrary place under the `nav` entry in `mkdocs.yml`. This page can also have tags, but the all the content in the file other than metadata and the title will be ignored.
+
+## How it Works and How to Customize
 
 ## License
 
