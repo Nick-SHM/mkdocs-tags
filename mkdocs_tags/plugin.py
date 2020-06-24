@@ -107,14 +107,12 @@ class MkDocsTags(BasePlugin):
         """ Generate on-page tags and the tags page"""
         if page.file.src_path == self.tags_page_md_path:
             jinja_tmplt = Template(self.tags_page_tmplt)
-            return jinja_tmplt.render(tags_and_pages=self.tags_and_pages)
-        else:
-            if 'tags' in page.meta and isinstance(page.meta['tags'], list):
-                jinja_tmplt = Template(self.on_page_tmplt)
-                return jinja_tmplt.render(
-                    tags=page.meta['tags'],
-                    markdown=markdown,
-                    empty=bool(page.meta['tags']),  # whether the list is empty
-                )
-            else:
-                return markdown
+            markdown = jinja_tmplt.render(tags_and_pages=self.tags_and_pages)
+        if 'tags' in page.meta and isinstance(page.meta['tags'], list):
+            jinja_tmplt = Template(self.on_page_tmplt)
+            markdown = jinja_tmplt.render(
+                tags=page.meta['tags'],
+                markdown=markdown,
+                empty=bool(page.meta['tags']),  # whether the list is empty
+            )
+        return markdown
