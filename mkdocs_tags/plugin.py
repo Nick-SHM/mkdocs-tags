@@ -3,6 +3,7 @@ from jinja2 import Template
 from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.plugins import PluginCollection
+from os.path import relpath, dirname
 
 
 class MkDocsTags(BasePlugin):
@@ -94,9 +95,12 @@ class MkDocsTags(BasePlugin):
                 for tag in page_copy.meta['tags']:
                     if tag not in self.tags_and_pages:
                         self.tags_and_pages[tag] = []
+                    path = relpath(
+                        page_copy.file.src_path,
+                        dirname(self.tags_page_md_path))
                     self.tags_and_pages[tag].append({
                         'title': page_copy.title,
-                        'src': page_copy.file.src_path
+                        'src': path
                     })
 
     def on_page_markdown(self, markdown, page, config, files):
