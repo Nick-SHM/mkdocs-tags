@@ -34,11 +34,11 @@ class MkDocsTags(BasePlugin):
 
     tags_meta_entry = 'tags'
 
-    tags_page_tmplt_cfg = 'tags-page-tmplt'
-    tags_page_tmplt_path_cfg = 'tags-page-tmplt-path'
-    on_page_tmplt_cfg = 'on-page-tmplt'
-    on_page_tmplt_path_cfg = 'on-page-tmplt-path'
-    tags_page_md_path_cfg = 'tags-page-md-path'
+    tags_page_tmplt_cfg = 'tags_page_tmplt'
+    tags_page_tmplt_path_cfg = 'tags_page_tmplt_path'
+    on_page_tmplt_cfg = 'on_page_tmplt'
+    on_page_tmplt_path_cfg = 'on_page_tmplt_path'
+    tags_page_md_path_cfg = 'tags_page_md_path'
 
     config_scheme = (
         (
