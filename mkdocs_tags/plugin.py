@@ -13,11 +13,11 @@ class MkDocsTags(BasePlugin):
     """
 
     dft_tags_page_tmplt = (
-        '# Tags\n'
+        '# {{page.title}}\n'
         '{% for tag in tags_and_pages %}\n'
         '## {{tag}}\n'
-        '{% for page in tags_and_pages[tag] %}\n'
-        '* [{{page["title"]}}]({{page["path"]}})\n'
+        '{% for page_under_tag in tags_and_pages[tag] %}\n'
+        '* [{{page_under_tag["title"]}}]({{page_under_tag["path"]}})\n'
         '{% endfor %}\n'
         '{% endfor %}\n'
     )
@@ -118,7 +118,11 @@ class MkDocsTags(BasePlugin):
         # Generate the tags page
         if page.file.src_path == self.tags_page_md_path:
             jinja_tmplt = Template(self.tags_page_tmplt)
-            markdown = jinja_tmplt.render(tags_and_pages=self.tags_and_pages)
+            markdown = jinja_tmplt.render(
+                tags_and_pages=self.tags_and_pages,
+                markdown=markdown,
+                page=page,
+                config=config)
         # Generate on-page tags lists
         if MkDocsTags.tags_meta_entry not in page.meta:
             return markdown
@@ -130,5 +134,9 @@ class MkDocsTags(BasePlugin):
                     str_tags.append(tag)
             jinja_tmplt = Template(self.on_page_tmplt)
             markdown = jinja_tmplt.render(
-                tags=str_tags, markdown=markdown, empty=bool(str_tags))
+                tags=str_tags,
+                markdown=markdown,
+                empty=bool(str_tags),
+                page=page,
+                config=config)
         return markdown
