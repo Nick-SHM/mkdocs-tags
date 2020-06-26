@@ -32,25 +32,33 @@ class MkDocsTags(BasePlugin):
         '{% endif %}\n'
     )
 
+    tags_meta_entry = 'tags'
+
+    tags_page_tmplt_cfg = 'tags-page-tmplt'
+    tags_page_tmplt_path_cfg = 'tags-page-tmplt-path'
+    on_page_tmplt_cfg = 'on-page-tmplt'
+    on_page_tmplt_path_cfg = 'on-page-tmplt-path'
+    tags_page_md_path_cfg = 'tags-page-md-path'
+
     config_scheme = (
         (
-            'tags-page-tmplt',
+            tags_page_tmplt_cfg,
             config_options.Type(str, default=dft_tags_page_tmplt)
         ),
         (
-            'tags-page-tmplt-path',
+            tags_page_tmplt_path_cfg,
             config_options.Type(str, default='')
         ),
         (
-            'on-page-tmplt',
+            on_page_tmplt_cfg,
             config_options.Type(str, default=dft_on_page_tmplt)
         ),
         (
-            'on-page-tmplt-path',
+            on_page_tmplt_path_cfg,
             config_options.Type(str, default='')
         ),
         (
-            'tags-page-md-path',
+            tags_page_md_path_cfg,
             config_options.Type(str, default='tags.md')
         )
     )
@@ -63,21 +71,22 @@ class MkDocsTags(BasePlugin):
 
     def on_config(self, config):
         """ Determines the templates from the config"""
-        # Tags page markdown path
-        self.tags_page_md_path = self.config['tags-page-md-path']
-        # Tags page template
-        if self.config['tags-page-tmplt-path'] == '':
-            self.tags_page_tmplt = self.config['tags-page-tmplt']
+        # Read the path of tags page markdown file
+        self.tags_page_md_path = self.config[MkDocsTags.tags_page_md_path_cfg]
+        # Read the template of the tags page
+        tags_page_tmplt_path = self.config[MkDocsTags.tags_page_tmplt_path_cfg]
+        docs_dir = config['docs_dir']
+        if tags_page_tmplt_path == '':
+            self.tags_page_tmplt = self.config[MkDocsTags.tags_page_tmplt_cfg]
         else:
-            with open(config['docs_dir'] + '/'
-                      + self.config['tags-page-tmplt-path']) as file:
+            with open(docs_dir + '/' + tags_page_tmplt_path) as file:
                 self.tags_page_tmplt = file.read()
-        # On-page tags template
-        if self.config['on-page-tmplt-path'] == '':
-            self.on_page_tmplt = self.config['on-page-tmplt']
+        # Read the template of on-page tags lists
+        on_page_tmplt_path = self.config[MkDocsTags.on_page_tmplt_path_cfg]
+        if on_page_tmplt_path == '':
+            self.on_page_tmplt = self.config[MkDocsTags.on_page_tmplt_cfg]
         else:
-            with open(config['docs_dir'] + '/'
-                      + self.config['on-page-tmplt-path']) as file:
+            with open(docs_dir + '/' + on_page_tmplt_path) as file:
                 self.on_page_tmplt = file.read()
         return config
 
@@ -90,26 +99,36 @@ class MkDocsTags(BasePlugin):
         for page in nav.pages:
             page_copy = copy.copy(page)
             page_copy.read_source(config_copy)  # Read meta data
-            if 'tags' in page_copy.meta and isinstance(
-                    page_copy.meta['tags'], list):
-                for tag in page_copy.meta['tags']:
-                    if tag not in self.tags_and_pages:
-                        self.tags_and_pages[tag] = []
-                    path = relpath(page_copy.file.src_path, dirname(
-                        self.tags_page_md_path))
-                    self.tags_and_pages[tag].append({
-                        'title': page_copy.title, 'path': path})
+            if MkDocsTags.tags_meta_entry not in page_copy.meta:
+                continue
+            tags = page_copy.meta[MkDocsTags.tags_meta_entry]
+            if isinstance(tags, list):
+                for tag in tags:
+                    if isinstance(tag, str):
+                        if tag not in self.tags_and_pages:
+                            self.tags_and_pages[tag] = []
+                        path = relpath(page_copy.file.src_path, dirname(
+                            self.tags_page_md_path))
+                        self.tags_and_pages[tag].append({
+                            'title': page_copy.title, 'path': path})
+        return nav
 
     def on_page_markdown(self, markdown, page, config, files):
-        """ Generate on-page tags and the tags page """
+        """ Generate on-page tags lists and the tags page """
+        # Generate the tags page
         if page.file.src_path == self.tags_page_md_path:
             jinja_tmplt = Template(self.tags_page_tmplt)
             markdown = jinja_tmplt.render(tags_and_pages=self.tags_and_pages)
-        if 'tags' in page.meta and isinstance(page.meta['tags'], list):
+        # Generate on-page tags lists
+        if MkDocsTags.tags_meta_entry not in page.meta:
+            return markdown
+        tags = page.meta[MkDocsTags.tags_meta_entry]
+        if isinstance(tags, list):
+            str_tags = []
+            for tag in tags:
+                if isinstance(tag, str):
+                    str_tags.append(tag)
             jinja_tmplt = Template(self.on_page_tmplt)
             markdown = jinja_tmplt.render(
-                tags=page.meta['tags'],
-                markdown=markdown,
-                empty=bool(page.meta['tags']),  # whether the list is empty
-            )
+                tags=str_tags, markdown=markdown, empty=bool(str_tags))
         return markdown
