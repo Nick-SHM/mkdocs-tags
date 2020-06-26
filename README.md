@@ -35,14 +35,14 @@ Add tags to a page as a list in the `tags` entry of the [metadata section](https
 ```
 ---
 tags:
-  - tag1
-  - tag2
+    - tag1
+    - tag2
 ---
 
 # Index
 ```
 
-Then a list of tags will be generated at the bottom of the page, if the page contains at least one tag.
+Then a list of tags will be generated on the bottom of the page, if the page contains at least one tag.
 
 ![On-page tag list](img/demo-index.png)
 
@@ -85,14 +85,14 @@ If both `tags_page_tmplt_path` and `tags_page_tmplt` are set, `tags_page_tmplt` 
 
 All the variables available for the template include:
 
--   `tags_and_pages`: a `dict` containing
--   `markdown`: the markdown source of the page, in a `str`
+-   `tags_and_pages`: a `dict` containing tags and pages info, see the default template about its usage.
+-   `markdown`: the markdown source of the page, in a `str`.
 -   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) or [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
 -   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) or [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ### On-page Tags List
 
-A list of tags will be rendered at the bottom of the page using [Jinja](https://jinja.palletsprojects.com). Customization options include:
+A list of tags will be rendered on the bottom of the page using [Jinja](https://jinja.palletsprojects.com). Customization options include:
 
 -   `on_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
 -   `on_page_tmplt`: the template as a string.
