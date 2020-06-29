@@ -2,6 +2,8 @@
 
 A tags plugin for [MkDocs](https://www.mkdocs.org).
 
+**Features might not be backward compatible until v1.0.**
+
 ## Installation
 
 ```bash
@@ -42,7 +44,7 @@ tags:
 # Index
 ```
 
-Then a list of tags will be generated on the bottom of the page, if the page contains at least one tag.
+Then, by default, a list of tags will be generated on the bottom of the page, if the page contains at least one tag.
 
 ![On-page tag list](img/demo-index.png)
 
@@ -56,13 +58,9 @@ You can add this page to an arbitrary place under the `nav` entry in `mkdocs.yml
 
 ### Tags Page
 
-A list of tags will be rendered at the bottom of the page using [Jinja](https://jinja.palletsprojects.com). Customization options include:
+A page with a list of all tags and the pages under each of them will be rendered using [Jinja](https://jinja.palletsprojects.com). Customization options include:
 
--   `tags_page_md_path`: the path, relative to `docs/`, to the markdown file which will be rendered as the tags page. The default value is `tags.md`.
--   `tags_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
--   `tags_page_tmplt`: the template as a string.
-
-Options should be put in `mkdocs.yml` under `tags` in the `plugins` entry. For example:
+Options should be put in `mkdocs.yml` under the plugin entry. For example:
 
 ```yaml
 plugins:
@@ -70,6 +68,10 @@ plugins:
     - tags:
           tags_page_md_path: path/to/tags/page.md
 ```
+
+-   `tags_page_md_path`: the path, relative to `docs/`, to the markdown file which will be rendered as the tags page. The default value is `tags.md`.
+-   `tags_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
+-   `tags_page_tmplt`: the template as a string.
 
 If both `tags_page_tmplt_path` and `tags_page_tmplt` are set, `tags_page_tmplt` will be ignored. If neither of them is set, the default template is:
 
@@ -85,10 +87,10 @@ If both `tags_page_tmplt_path` and `tags_page_tmplt` are set, `tags_page_tmplt` 
 
 All the variables available for the template include:
 
--   `tags_and_pages`: a `dict` containing tags and pages info, see the default template about its usage.
+-   `tags_and_pages`: a `dict` containing tags and pages info, see the default template about its usage. **This is subject to change until the release of v1.0.**
 -   `markdown`: the markdown source of the page, in a `str`.
--   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) or [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
--   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) or [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
+-   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
+-   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ### On-page Tags List
 
@@ -111,11 +113,11 @@ Tags: **{{ tags | join("**, **") }}**
 
 All the variables available for the template include:
 
--   `tags`: all tags of this page, in a `list`.
+-   `tags`: all the tags of this page, in a `list`.
 -   `markdown`: the markdown source of the page, in a `str`.
 -   `empty`: whether the page contains at least one tag.
--   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) or [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
--   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) or [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
+-   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
+-   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ## License
 
