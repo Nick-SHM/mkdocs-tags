@@ -1,5 +1,23 @@
 # Change Log
 
+## [0.3] - 2020-06-30
+
+### Added
+
+-   Add CHANGELOG
+-   Add CONTRIBUTING
+-   Add CODE_OF_CONDUCT
+-   Add EditorConfig
+
+### Changed
+
+-   Comply with [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+-   Improve README
+    -   Adjust structure
+    -   Add reminder for no backward compatibility before v1.0
+    -   Fix typos
+-   Add GitHub gitignore for Python
+
 ## [0.2] - 2020-06-26
 
 ### Added
