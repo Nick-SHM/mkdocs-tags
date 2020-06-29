@@ -18,7 +18,7 @@ import setuptools
 with open(path.join(path.dirname(__file__), 'README.md')) as readme:
     setuptools.setup(
         name='mkdocs-tags',
-        version='0.2',
+        version='0.3',
         description='Tags plugin for MkDocs',
         long_description=readme.read(),
         long_description_content_type='text/markdown',
