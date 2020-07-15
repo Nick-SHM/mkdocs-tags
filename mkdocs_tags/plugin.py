@@ -88,7 +88,7 @@ class MkDocsTags(plugins.BasePlugin):
         ),
     )
 
-    def __init__(self):
+    def __init__(self) -> None:
         self._tags_and_pages: Dict[str, Dict[str, str]] = {}
         self._tags_page_md_path = ''
         self._tags_page_tmplt = ''
