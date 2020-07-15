@@ -1,6 +1,6 @@
 # MkDocs Tags Plugin
 
-A tags plugin for [MkDocs](https://www.mkdocs.org).
+An [MkDocs](https://www.mkdocs.org) plugin for tags support.
 
 **Features might not be backward compatible until v1.0.**
 
@@ -50,30 +50,30 @@ Then, by default, a list of tags will be generated on the bottom of the page, if
 
 Create `tags.md` in `docs/`. This file will contain a list of all tags and the pages under each of them.
 
-![Tags page](img/demo-tags-page.png)
+![Tag page](img/demo-tag-page.png)
 
 You can add this page to an arbitrary place under the `nav` entry in `mkdocs.yml`. This page can also have tags, but by default, all the content in the file other than the metadata and the title will be ignored.
 
 ## Detailed Guide
 
-### Tags Page
-
-A page with a list of all tags and the pages under each of them will be rendered using [Jinja](https://jinja.palletsprojects.com). Customization options include:
-
-Options should be put in `mkdocs.yml` under the plugin entry. For example:
+Customization options should be put in `mkdocs.yml` under the plugin entry. For example:
 
 ```yaml
 plugins:
     - search
     - tags:
-          tags_page_md_path: path/to/tags/page.md
+          tag_page_md_path: path/to/tags/page.md
 ```
 
--   `tags_page_md_path`: the path, relative to `docs/`, to the markdown file which will be rendered as the tags page. The default value is `tags.md`.
--   `tags_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
--   `tags_page_tmplt`: the template as a string.
+### Tags Page
 
-If both `tags_page_tmplt_path` and `tags_page_tmplt` are set, `tags_page_tmplt` will be ignored. If neither of them is set, the default template is:
+A page with a list of all tags and the pages under each of them will be rendered using [Jinja](https://jinja.palletsprojects.com). Customization options includes:
+
+-   `tag_page_md_path`: the path, relative to `docs/`, to the markdown file which will be rendered as the tag page. The default value is `tags.md`.
+-   `tag_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
+-   `tag_page_tmplt`: the template as a string.
+
+If both `tag_page_tmplt_path` and `tag_page_tmplt` are set, `tag_page_tmplt` will be ignored. If neither of them is set, the default template is:
 
 ```jinja
 # {{page.title}}
@@ -92,9 +92,9 @@ All the variables available for the template include:
 -   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
 -   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
-### On-page Tags List
+### On-page Tag List
 
-A list of tags will be rendered on the bottom of the page using [Jinja](https://jinja.palletsprojects.com). Customization options include:
+A list of tags will be rendered on the bottom of each page using [Jinja](https://jinja.palletsprojects.com). Customization options include:
 
 -   `on_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
 -   `on_page_tmplt`: the template as a string.

@@ -19,7 +19,7 @@ with open(path.join(path.dirname(__file__), 'README.md')) as readme:
     setuptools.setup(
         name='mkdocs-tags',
         version='0.3',
-        description='Tags plugin for MkDocs',
+        description='An MkDocs plugin for tags support',
         long_description=readme.read(),
         long_description_content_type='text/markdown',
         url='https://github.com/Nick-SHM/mkdocs-tags',

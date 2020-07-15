@@ -4,8 +4,12 @@
 
 ### Changed
 
+-   **Breaking API change**: change config entry `tags_page_tmplt` to `tag_page_tmplt`
+-   **Breaking API change**: change config entry `tags_page_tmplt_path` to `tag_page_tmplt_path`
+-   **Breaking API change**: change config entry `tags_page_md_path` to `tag_page_md_path`
 -   Temporarily removed `README.md`
 -   Add a link to changelog in `README.md`
+-   Fix typos in comments and `README.md`
 
 ## [0.3] - 2020-06-30
 
