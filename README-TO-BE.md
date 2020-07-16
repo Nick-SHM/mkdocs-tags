@@ -119,6 +119,10 @@ All the variables available for the template include:
 -   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
 -   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md)
+
 ## License
 
 This project is under [Apache License 2.0](LICENSE).

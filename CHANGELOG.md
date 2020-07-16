@@ -5,6 +5,7 @@
 ### Changed
 
 -   Temporarily removed `README.md`
+-   Add a link to changelog in `README.md`
 
 ## [0.3] - 2020-06-30
 
