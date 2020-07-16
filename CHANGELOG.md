@@ -1,5 +1,11 @@
 # Change Log
 
+## [0.4] -
+
+### Changed
+
+-   Temporarily removed `README.md`
+
 ## [0.3] - 2020-06-30
 
 ### Added
