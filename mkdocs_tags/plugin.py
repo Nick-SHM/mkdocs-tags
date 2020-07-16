@@ -20,6 +20,8 @@ list of all tags and the pages under each of them.
 Not intended for direct import.
 """
 
+from __future__ import annotations
+
 import copy
 import jinja2
 from mkdocs import config
@@ -28,7 +30,7 @@ from mkdocs.structure import nav
 from mkdocs.structure import pages
 from mkdocs import plugins
 from os import path
-from typing import Dict
+from typing import Dict, List
 
 _TAGS_META_ENTRY = 'tags'
 _ON_PAGE_TMPLT_CFG_ENTRY = 'on_page_tmplt'
@@ -39,21 +41,55 @@ _TAG_PAGE_MD_PATH_CFG_ENTRY = 'tag_page_md_path'
 
 _DFT_TAG_PAGE_TMPLT = """# {{page.title}}
 {% for tag in tags_and_pages %}
-## {{tag}}
-{% for page_under_tag in tags_and_pages[tag] %}
-* [{{page_under_tag["title"]}}]({{page_under_tag["path"]}})
+## {{tag.name}}
+{% for page_info in tags_and_pages[tag] %}
+* [{{ page_info.title }}]({{ page_info.rel_path }})
 {% endfor %}
 {% endfor %}
 """
 
-_DFT_ON_PAGE_TMPLT = """{{markdown}}
-{% if empty %}
+_DFT_ON_PAGE_TMPLT = """{% set links = [] %}
+{% for tag in tags %}
+{{ links.append('[' + tag.name + '](' + tag_page_md_rel_path +
+    '#' + tag.permalink + ')') or "" }}
+{% endfor %}
 
+{{ markdown }}
+{% if tags %}
 ---
-
-Tags: **{{ tags | join("**, **") }}**
+Tags: **{{ links | join('**, **')}}**
 {% endif %}
 """
+
+
+class _TagInfo:
+    def __init__(self, name) -> None:
+        self.name = name
+
+        permalink_char_list = []
+        for c in name:
+            permalink_char_list.append(c if c != ' ' else '-')
+            # BUG: repeated permalink not correctly handled
+        self.permalink = ''.join(permalink_char_list)
+
+    def __hash__(self) -> int:
+        return hash(self.name)
+
+    def __eq__(self, other: _TagInfo) -> bool:
+        return self.name == other.name
+
+    def __ne__(self, other: _TagInfo) -> bool:
+        return not (self.name == other.name)
+
+
+class _PageInfo:
+    def __init__(self, page: pages.Page, tag_page_md_path: str) -> None:
+        self.title: str = page.title
+        self.abs_path = page.file.src_path
+        self.rel_path = path.relpath(
+            path=self.abs_path,
+            start=path.dirname(tag_page_md_path),
+        )
 
 
 class MkDocsTags(plugins.BasePlugin):
@@ -89,7 +125,7 @@ class MkDocsTags(plugins.BasePlugin):
     )
 
     def __init__(self) -> None:
-        self._tags_and_pages: Dict[str, Dict[str, str]] = {}
+        self._tags_and_pages: Dict[_TagInfo, List[_PageInfo]] = {}
         self._tag_page_md_path = ''
         self._tag_page_tmplt = ''
         self._on_page_tmplt = ''
@@ -138,19 +174,20 @@ class MkDocsTags(plugins.BasePlugin):
             page_copy.read_source(config_copy)  # Read meta data
             if _TAGS_META_ENTRY not in page_copy.meta:
                 continue
-            tags = page_copy.meta[_TAGS_META_ENTRY]
-            if isinstance(tags, list):
-                for tag in tags:
-                    if isinstance(tag, str):
-                        if tag not in self._tags_and_pages:
-                            self._tags_and_pages[tag] = []
-                        page_path = path.relpath(
-                            page_copy.file.src_path,
-                            path.dirname(self._tag_page_md_path))
-                        self._tags_and_pages[tag].append({
-                            'title': page_copy.title,
-                            'path': page_path
-                        })
+            tag_names = page_copy.meta[_TAGS_META_ENTRY]
+            if not isinstance(tag_names, list):
+                continue
+            for tag_name in tag_names:
+                if not isinstance(tag_name, str):
+                    continue
+                tag = _TagInfo(name=tag_name)
+                if tag not in self._tags_and_pages:
+                    self._tags_and_pages[tag] = []
+                self._tags_and_pages[tag].append(
+                    _PageInfo(
+                        page=page_copy,
+                        tag_page_md_path=self._tag_page_md_path,
+                    ))
         return nav
 
     def on_page_markdown(
@@ -176,18 +213,25 @@ class MkDocsTags(plugins.BasePlugin):
         # Generate on-page tag lists
         if _TAGS_META_ENTRY not in page.meta:
             return markdown
-        tags = page.meta[_TAGS_META_ENTRY]
-        if isinstance(tags, list):
-            str_tags = []  # tags that are a `str`
-            for tag in tags:
-                if isinstance(tag, str):
-                    str_tags.append(tag)
-            jinja_tmplt = jinja2.Template(self._on_page_tmplt)
-            markdown = jinja_tmplt.render(
-                tags=str_tags,
-                markdown=markdown,
-                empty=bool(str_tags),
-                page=page,
-                config=config,
-            )
+        tag_names = page.meta[_TAGS_META_ENTRY]
+        tags: List[_TagInfo] = []
+        if not isinstance(tag_names, list):
+            return markdown
+        for tag_name in tag_names:
+            if not isinstance(tag_name, str):
+                continue
+            tag = _TagInfo(name=tag_name)
+            tags.append(tag)
+        jinja_tmplt = jinja2.Template(self._on_page_tmplt)
+        tag_page_md_rel_path = path.relpath(
+            path=self._tag_page_md_path,
+            start=path.dirname(page.file.src_path),
+        )
+        markdown = jinja_tmplt.render(
+            tags=tags,
+            markdown=markdown,
+            page=page,
+            config=config,
+            tag_page_md_rel_path=tag_page_md_rel_path,
+        )
         return markdown

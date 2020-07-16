@@ -2,11 +2,17 @@
 
 ## [0.4] -
 
+### Added
+
+-   Links to the section of the tags page in the on-page tag lists
+
 ### Changed
 
 -   **Breaking API change**: change config entry `tags_page_tmplt` to `tag_page_tmplt`
 -   **Breaking API change**: change config entry `tags_page_tmplt_path` to `tag_page_tmplt_path`
 -   **Breaking API change**: change config entry `tags_page_md_path` to `tag_page_md_path`
+-   **Breaking API change**: add new type `_TagInfo` to replace the original `str` approach
+-   **Breaking API change**: add new type `_PageInfo` to replace the original `dict` approach
 -   Temporarily removed `README.md`
 -   Add a link to changelog in `README.md`
 -   Fix typos in comments and `README.md`
