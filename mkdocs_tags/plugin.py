@@ -32,12 +32,12 @@ from mkdocs import plugins
 from os import path
 from typing import Dict, List
 
-_TAGS_META_ENTRY = 'tags'
-_ON_PAGE_TMPLT_CFG_ENTRY = 'on_page_tmplt'
-_ON_PAGE_TMPLT_PATH_CFG_ENTRY = 'on_page_tmplt_path'
-_TAG_PAGE_TMPLT_CFG_ENTRY = 'tag_page_tmplt'
-_TAG_PAGE_TMPLT_PATH_CFG_ENTRY = 'tag_page_tmplt_path'
-_TAG_PAGE_MD_PATH_CFG_ENTRY = 'tag_page_md_path'
+_TAGS_META_ENTRY = "tags"
+_ON_PAGE_TMPLT_CFG_ENTRY = "on_page_tmplt"
+_ON_PAGE_TMPLT_PATH_CFG_ENTRY = "on_page_tmplt_path"
+_TAG_PAGE_TMPLT_CFG_ENTRY = "tag_page_tmplt"
+_TAG_PAGE_TMPLT_PATH_CFG_ENTRY = "tag_page_tmplt_path"
+_TAG_PAGE_MD_PATH_CFG_ENTRY = "tag_page_md_path"
 
 _DFT_TAG_PAGE_TMPLT = """# {{page.title}}
 {% for tag in tags_and_pages %}
@@ -68,9 +68,9 @@ class _TagInfo:
 
         permalink_char_list = []
         for c in name:
-            permalink_char_list.append(c if c != ' ' else '-')
+            permalink_char_list.append(c if c != " " else "-")
             # BUG: repeated permalink not correctly handled
-        self.permalink = ''.join(permalink_char_list)
+        self.permalink = "".join(permalink_char_list)
 
     def __hash__(self) -> int:
         return hash(self.name)
@@ -87,8 +87,7 @@ class _PageInfo:
         self.title: str = page.title
         self.abs_path = page.file.src_path
         self.rel_path = path.relpath(
-            path=self.abs_path,
-            start=path.dirname(tag_page_md_path),
+            path=self.abs_path, start=path.dirname(tag_page_md_path)
         )
 
 
@@ -108,7 +107,7 @@ class MkDocsTags(plugins.BasePlugin):
         ),
         (
             _TAG_PAGE_TMPLT_PATH_CFG_ENTRY,
-            config.config_options.Type(str, default=''),
+            config.config_options.Type(str, default=""),
         ),
         (
             _ON_PAGE_TMPLT_CFG_ENTRY,
@@ -116,19 +115,19 @@ class MkDocsTags(plugins.BasePlugin):
         ),
         (
             _ON_PAGE_TMPLT_PATH_CFG_ENTRY,
-            config.config_options.Type(str, default=''),
+            config.config_options.Type(str, default=""),
         ),
         (
             _TAG_PAGE_MD_PATH_CFG_ENTRY,
-            config.config_options.Type(str, default='tags.md'),
+            config.config_options.Type(str, default="tags.md"),
         ),
     )
 
     def __init__(self) -> None:
         self._tags_and_pages: Dict[_TagInfo, List[_PageInfo]] = {}
-        self._tag_page_md_path = ''
-        self._tag_page_tmplt = ''
-        self._on_page_tmplt = ''
+        self._tag_page_md_path = ""
+        self._tag_page_tmplt = ""
+        self._on_page_tmplt = ""
 
     def on_config(self, config: config.Config) -> config.Config:
         """Determines the templates from the config.
@@ -139,15 +138,15 @@ class MkDocsTags(plugins.BasePlugin):
         self._tag_page_md_path = self.config[_TAG_PAGE_MD_PATH_CFG_ENTRY]
         # Read the template of the tag page
         tag_page_tmplt_path = self.config[_TAG_PAGE_TMPLT_PATH_CFG_ENTRY]
-        docs_dir = config['docs_dir']
-        if tag_page_tmplt_path == '':
+        docs_dir = config["docs_dir"]
+        if tag_page_tmplt_path == "":
             self._tag_page_tmplt = self.config[_TAG_PAGE_TMPLT_CFG_ENTRY]
         else:
             with open(path.join(docs_dir, tag_page_tmplt_path)) as file:
                 self._tag_page_tmplt = file.read()
         # Read the template of on-page tag lists
         on_page_tmplt_path = self.config[_ON_PAGE_TMPLT_PATH_CFG_ENTRY]
-        if on_page_tmplt_path == '':
+        if on_page_tmplt_path == "":
             self._on_page_tmplt = self.config[_ON_PAGE_TMPLT_CFG_ENTRY]
         else:
             with open(path.join(docs_dir, on_page_tmplt_path)) as file:
@@ -155,17 +154,14 @@ class MkDocsTags(plugins.BasePlugin):
         return config
 
     def on_nav(
-        self,
-        nav: nav.Navigation,
-        config: config.Config,
-        files: files.Files,
+        self, nav: nav.Navigation, config: config.Config, files: files.Files,
     ) -> nav.Navigation:
         """Reads tag and title info into `self.tags_and_pages`.
 
         See base class for argument and return value info.
         """
         config_copy = copy.copy(config)
-        config_copy['plugins'] = plugins.PluginCollection()
+        config_copy["plugins"] = plugins.PluginCollection()
         # Remove plugins in `config`. Otherwise,
         # `page_copy.read_source()` will call `on_page_read_source()`
         # for each plugin
@@ -185,9 +181,9 @@ class MkDocsTags(plugins.BasePlugin):
                     self._tags_and_pages[tag] = []
                 self._tags_and_pages[tag].append(
                     _PageInfo(
-                        page=page_copy,
-                        tag_page_md_path=self._tag_page_md_path,
-                    ))
+                        page=page_copy, tag_page_md_path=self._tag_page_md_path
+                    )
+                )
         return nav
 
     def on_page_markdown(
@@ -224,8 +220,7 @@ class MkDocsTags(plugins.BasePlugin):
             tags.append(tag)
         jinja_tmplt = jinja2.Template(self._on_page_tmplt)
         tag_page_md_rel_path = path.relpath(
-            path=self._tag_page_md_path,
-            start=path.dirname(page.file.src_path),
+            path=self._tag_page_md_path, start=path.dirname(page.file.src_path)
         )
         markdown = jinja_tmplt.render(
             tags=tags,

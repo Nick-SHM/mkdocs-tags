@@ -15,31 +15,31 @@
 from os import path
 import setuptools
 
-with open(path.join(path.dirname(__file__), 'README.md')) as readme:
+with open(path.join(path.dirname(__file__), "README.md")) as readme:
     setuptools.setup(
-        name='mkdocs-tags',
-        version='0.3',
-        description='An MkDocs plugin for tags support',
+        name="mkdocs-tags",
+        version="0.3",
+        description="An MkDocs plugin for tags support",
         long_description=readme.read(),
-        long_description_content_type='text/markdown',
-        url='https://github.com/Nick-SHM/mkdocs-tags',
-        author='Nick Shu',
-        author_email='nick.shm.shu.git+noreply@outlook.com',
-        license='Apache',
+        long_description_content_type="text/markdown",
+        url="https://github.com/Nick-SHM/mkdocs-tags",
+        author="Nick Shu",
+        author_email="nick.shm.shu.git+noreply@outlook.com",
+        license="Apache",
         classifiers=[
-            'License :: OSI Approved :: Apache Software License',
-            'Operating System :: OS Independent',
-            'Programming Language :: Python',
-            'Programming Language :: Python :: 3 :: Only',
-            'Intended Audience :: Developers',
-            'Topic :: Documentation',
-            'Topic :: Software Development :: Documentation',
+            "License :: OSI Approved :: Apache Software License",
+            "Operating System :: OS Independent",
+            "Programming Language :: Python",
+            "Programming Language :: Python :: 3 :: Only",
+            "Intended Audience :: Developers",
+            "Topic :: Documentation",
+            "Topic :: Software Development :: Documentation",
         ],
-        keywords='mkdocs tag',
+        keywords="mkdocs tag",
         packages=setuptools.find_packages(),
-        install_requires=['mkdocs'],
-        python_requires='>=3.6',
+        install_requires=["mkdocs"],
+        python_requires=">=3.6",
         entry_points={
-            'mkdocs.plugins': ['tags = mkdocs_tags.plugin:MkDocsTags']
+            "mkdocs.plugins": ["tags = mkdocs_tags.plugin:MkDocsTags"]
         },
     )
