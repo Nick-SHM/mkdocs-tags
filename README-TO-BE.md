@@ -54,7 +54,7 @@ Create `tags.md` in `docs/`. This file will contain a list of all tags and the p
 
 You can add this page to an arbitrary place under the `nav` entry in `mkdocs.yml`. This page can also have tags, but by default, all the content in the file other than the metadata and the title will be ignored.
 
-## Detailed Guide
+## Customization
 
 Customization options should be put in `mkdocs.yml` under the plugin entry. For example:
 
@@ -69,37 +69,69 @@ plugins:
 
 A page with a list of all tags and the pages under each of them will be rendered using [Jinja](https://jinja.palletsprojects.com). Customization options includes:
 
--   `tag_page_md_path`: the path, relative to `docs/`, to the markdown file which will be rendered as the tag page. The default value is `tags.md`.
--   `tag_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
--   `tag_page_tmplt`: the template as a string.
+#### `tag_page_md_path`
 
-If both `tag_page_tmplt_path` and `tag_page_tmplt` are set, `tag_page_tmplt` will be ignored. If neither of them is set, the default template is:
+The path, relative to `docs/`, to the markdown file which will be rendered as the tag page. The default value is `tags.md`.
+
+#### `tag_page_tmplt_path`
+
+The path, **relative to `docs/`**, to the Jinja template file. It takes precedence over `tag_page_tmplt`.
+
+#### `tag_page_tmplt`
+
+The template as a string. `tag_page_tmplt` takes precedence over it.
+
+#### The Template
+
+If neither `tag_page_tmplt` nor `tag_page_md_path` is set, the default template is:
 
 ```jinja
 # {{page.title}}
 {% for tag in tags_and_pages %}
-## {{tag}}
-{% for page_under_tag in tags_and_pages[tag] %}
-* [{{page_under_tag["title"]}}]({{page_under_tag["path"]}})
+## {{tag.name}}
+{% for page_info in tags_and_pages[tag] %}
+* [{{ page_info.title }}]({{ page_info.rel_path }})
 {% endfor %}
-{% endfor %}
+{% endfor %}}
 ```
 
-All the variables available for the template include:
+Variables available for the template include:
 
--   `tags_and_pages`: a `dict` containing tags and pages info, see the default template about its usage. **This is subject to change until the release of v1.0.**
--   `markdown`: the markdown source of the page, in a `str`.
--   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
--   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
+##### `tags_and_pages`
+
+A `Dict[_TagInfo, List[_PageInfo]]` containing tag and page info.
+
+`_TagInfo` class has attributes `name` and `permalink` (permalink suffix without `#`).
+
+`_PageInfo` class has attributes `title`, `abs_path`, and `rel_path` (relative path to the tag page).
+
+##### `markdown`
+
+The markdown source of the page, in a `str`.
+
+##### `page`
+
+The `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
+
+##### `config`
+
+The global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ### On-page Tag List
 
 A list of tags will be rendered on the bottom of each page using [Jinja](https://jinja.palletsprojects.com). Customization options include:
 
--   `on_page_tmplt_path`: the path, **relative to `docs/`**, to the Jinja template file.
--   `on_page_tmplt`: the template as a string.
+#### `on_page_tmplt_path`
 
-If both options are set, `on_page_tmplt` will be ignored. If neither of them is set, the default template is:
+The path, **relative to `docs/`**, to the Jinja template file. It takes precedence over `on_page_tmplt`.
+
+#### `on_page_tmplt`
+
+The template as a string. `on_page_tmplt_path` takes precedence over it.
+
+#### The Template
+
+If neither `on_page_tmplt_path` nor `on_page_tmplt` is set, the default template is:
 
 ```jinja
 {{markdown}}
@@ -111,13 +143,27 @@ Tags: **{{ tags | join("**, **") }}**
 {% endif %}
 ```
 
-All the variables available for the template include:
+Variables available for the template include:
 
--   `tags`: all the tags of this page, in a `list`.
--   `markdown`: the markdown source of the page, in a `str`.
--   `empty`: whether the page contains at least one tag.
--   `page`: the `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
--   `config`: the global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
+##### `tags`
+
+All the tags of this page, in a `list[_Tag_Info]`. See [above](#tags_and_pages) for info about `_Tag_Info`.
+
+##### `tag_page_md_rel_path`
+
+The path to the tag page, relative to the current page.
+
+##### `markdown`
+
+The markdown source of the page, in a `str`.
+
+##### `page`
+
+The `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
+
+##### `config`
+
+The global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ## Changelog
 
