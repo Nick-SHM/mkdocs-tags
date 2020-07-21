@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import copy
 import jinja2
+import operator
 from mkdocs import config
 from mkdocs.structure import files
 from mkdocs.structure import nav
@@ -184,6 +185,15 @@ class MkDocsTags(plugins.BasePlugin):
                         page=page_copy, tag_page_md_path=self._tag_page_md_path
                     )
                 )
+        # Sort the tags and the lists of pages under each of them
+        for tag in self._tags_and_pages:
+            self._tags_and_pages[tag].sort(key=operator.attrgetter("title"))
+        self._tags_and_pages = {
+            tag: self._tags_and_pages[tag]
+            for tag in sorted(
+                self._tags_and_pages, key=operator.attrgetter("name")
+            )
+        }
         return nav
 
     def on_page_markdown(

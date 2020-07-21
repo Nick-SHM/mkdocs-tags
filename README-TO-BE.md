@@ -99,7 +99,7 @@ Variables available for the template include:
 
 ##### `tags_and_pages`
 
-A `Dict[_TagInfo, List[_PageInfo]]` containing tag and page info.
+A `Dict[_TagInfo, List[_PageInfo]]` containing tag and page info. Tags and pages are sorted lexicographically by their names and titles.
 
 `_TagInfo` class has attributes `name` and `permalink` (permalink suffix without `#`).
 
