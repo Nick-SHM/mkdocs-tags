@@ -87,9 +87,9 @@ If neither `tag_page_tmplt` nor `tag_page_md_path` is set, the default template 
 
 ```jinja
 # {{page.title}}
-{% for tag in tags_and_pages %}
+{% for tag in pages_under_tag %}
 ## {{tag.name}}
-{% for page_info in tags_and_pages[tag] %}
+{% for page_info in pages_under_tag[tag] %}
 * [{{ page_info.title }}]({{ page_info.rel_path }})
 {% endfor %}
 {% endfor %}}
@@ -97,11 +97,11 @@ If neither `tag_page_tmplt` nor `tag_page_md_path` is set, the default template 
 
 Variables available for the template include:
 
-##### `tags_and_pages`
+##### `pages_under_tag`
 
 A `Dict[_TagInfo, List[_PageInfo]]` containing tag and page info. Tags and pages are sorted lexicographically by their names and titles.
 
-`_TagInfo` class has attributes `name` and `permalink` (permalink suffix without `#`).
+`_TagInfo` class has attributes `name` and `header_id` (HTML `id` of the section of the tag on the tag page, without `#`).
 
 `_PageInfo` class has attributes `title`, `abs_path`, and `rel_path` (relative path to the tag page).
 
@@ -147,7 +147,7 @@ Variables available for the template include:
 
 ##### `tags`
 
-All the tags of this page, in a `list[_Tag_Info]`. See [above](#tags_and_pages) for info about `_Tag_Info`.
+All the tags of this page, in a `list[_Tag_Info]`. See [above](#pages_under_tag) for info about `_Tag_Info`.
 
 ##### `tag_page_md_rel_path`
 

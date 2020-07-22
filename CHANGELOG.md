@@ -13,6 +13,7 @@
 -   **Breaking API change**: change config entry `tags_page_md_path` to `tag_page_md_path`
 -   **Breaking API change**: add new type `_TagInfo` to replace the original `str` approach
 -   **Breaking API change**: add new type `_PageInfo` to replace the original `dict` approach
+-   **Breaking API change**: change the name of `tags_and_pages` in tag page template to `pages_under_tag`
 -   Tags and pages are now sorted on the tags page
 -   Temporarily removed `README.md`
 -   Add a link to changelog in `README.md`

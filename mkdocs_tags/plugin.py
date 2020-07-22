@@ -24,6 +24,7 @@ from __future__ import annotations
 
 import copy
 import jinja2
+import markdown
 import operator
 from mkdocs import config
 from mkdocs.structure import files
@@ -32,6 +33,7 @@ from mkdocs.structure import pages
 from mkdocs import plugins
 from os import path
 from typing import Dict, List
+from xml.etree import ElementTree
 
 _TAGS_META_ENTRY = "tags"
 _ON_PAGE_TMPLT_CFG_ENTRY = "on_page_tmplt"
@@ -41,9 +43,9 @@ _TAG_PAGE_TMPLT_PATH_CFG_ENTRY = "tag_page_tmplt_path"
 _TAG_PAGE_MD_PATH_CFG_ENTRY = "tag_page_md_path"
 
 _DFT_TAG_PAGE_TMPLT = """# {{page.title}}
-{% for tag in tags_and_pages %}
+{% for tag in pages_under_tag %}
 ## {{tag.name}}
-{% for page_info in tags_and_pages[tag] %}
+{% for page_info in pages_under_tag[tag] %}
 * [{{ page_info.title }}]({{ page_info.rel_path }})
 {% endfor %}
 {% endfor %}
@@ -52,7 +54,7 @@ _DFT_TAG_PAGE_TMPLT = """# {{page.title}}
 _DFT_ON_PAGE_TMPLT = """{% set links = [] %}
 {% for tag in tags %}
 {{ links.append('[' + tag.name + '](' + tag_page_md_rel_path +
-    '#' + tag.permalink + ')') or "" }}
+    '#' + tag.header_id + ')') or "" }}
 {% endfor %}
 
 {{ markdown }}
@@ -66,12 +68,7 @@ Tags: **{{ links | join('**, **')}}**
 class _TagInfo:
     def __init__(self, name) -> None:
         self.name = name
-
-        permalink_char_list = []
-        for c in name:
-            permalink_char_list.append(c if c != " " else "-")
-            # BUG: repeated permalink not correctly handled
-        self.permalink = "".join(permalink_char_list)
+        self.header_id = ""  # to be set in `_set_header_ids()`
 
     def __hash__(self) -> int:
         return hash(self.name)
@@ -90,6 +87,8 @@ class _PageInfo:
         self.rel_path = path.relpath(
             path=self.abs_path, start=path.dirname(tag_page_md_path)
         )
+        self.tags: List[_TagInfo] = []
+        # to be set in `_collect_tags_and_pages_info()`
 
 
 class MkDocsTags(plugins.BasePlugin):
@@ -125,7 +124,9 @@ class MkDocsTags(plugins.BasePlugin):
     )
 
     def __init__(self) -> None:
-        self._tags_and_pages: Dict[_TagInfo, List[_PageInfo]] = {}
+        self._pages_under_tag: Dict[_TagInfo, List[_PageInfo]] = {}
+        self._page_info_of_abs_path: Dict[str, _PageInfo] = {}
+        self._tag_info_of_name: Dict[str, _TagInfo] = {}
         self._tag_page_md_path = ""
         self._tag_page_tmplt = ""
         self._on_page_tmplt = ""
@@ -154,12 +155,18 @@ class MkDocsTags(plugins.BasePlugin):
                 self._on_page_tmplt = file.read()
         return config
 
-    def on_nav(
-        self, nav: nav.Navigation, config: config.Config, files: files.Files,
-    ) -> nav.Navigation:
-        """Reads tag and title info into `self.tags_and_pages`.
+    def _collect_tags_and_pages_info(
+        self, nav: nav.Navigation, config: config.Config
+    ) -> str:
+        """Collects unsorted tags and pages info from markdown files.
 
-        See base class for argument and return value info.
+        Args:
+            nav: the `mkdocs.structure.nav.Navigation` instance of the site
+            config: the `mkdocs.config.Config` instance of the site
+
+        Returns:
+            a str containing title of the tag page, to be used in
+            `_set_header_ids()`
         """
         config_copy = copy.copy(config)
         config_copy["plugins"] = plugins.PluginCollection()
@@ -169,6 +176,14 @@ class MkDocsTags(plugins.BasePlugin):
         for page in nav.pages:
             page_copy = copy.copy(page)
             page_copy.read_source(config_copy)  # Read meta data
+            # Collect the title of the tag page
+            if page_copy.file.src_path == self._tag_page_md_path:
+                tag_page_title = page_copy.title
+            # Collect tag and page info
+            page_info = _PageInfo(
+                page=page_copy, tag_page_md_path=self._tag_page_md_path
+            )
+            self._page_info_of_abs_path[page_info.abs_path] = page_info
             if _TAGS_META_ENTRY not in page_copy.meta:
                 continue
             tag_names = page_copy.meta[_TAGS_META_ENTRY]
@@ -177,23 +192,64 @@ class MkDocsTags(plugins.BasePlugin):
             for tag_name in tag_names:
                 if not isinstance(tag_name, str):
                     continue
-                tag = _TagInfo(name=tag_name)
-                if tag not in self._tags_and_pages:
-                    self._tags_and_pages[tag] = []
-                self._tags_and_pages[tag].append(
-                    _PageInfo(
-                        page=page_copy, tag_page_md_path=self._tag_page_md_path
-                    )
-                )
-        # Sort the tags and the lists of pages under each of them
-        for tag in self._tags_and_pages:
-            self._tags_and_pages[tag].sort(key=operator.attrgetter("title"))
-        self._tags_and_pages = {
-            tag: self._tags_and_pages[tag]
+                if tag_name in self._tag_info_of_name:
+                    tag = self._tag_info_of_name[tag_name]
+                else:
+                    tag = _TagInfo(name=tag_name)
+                    self._tag_info_of_name[tag_name] = tag
+                page_info.tags.append(tag)
+                if tag not in self._pages_under_tag:
+                    self._pages_under_tag[tag] = []
+                self._pages_under_tag[tag].append(page_info)
+        return tag_page_title
+
+    def _sort_tags_and_pages(self):
+        """Sorts the tags and pages info by their names and titles."""
+        for tag in self._pages_under_tag:
+            self._pages_under_tag[tag].sort(key=operator.attrgetter("title"))
+        self._pages_under_tag = {
+            tag: self._pages_under_tag[tag]
             for tag in sorted(
-                self._tags_and_pages, key=operator.attrgetter("name")
+                self._pages_under_tag, key=operator.attrgetter("name")
             )
         }
+
+    def _set_header_ids(self, tag_page_title):
+        """Sets the header ids of the tags on the tags page.
+
+        Precondition: `self._tags_and_pages` has been sorted.
+
+        This function sets header ids by rendering a mock tag page using
+        Python-Markdown search for the ids by the headers
+        """
+        # Generate a mock markdown file for the tags page
+        md = "# " + tag_page_title + "\n\n"
+        for tag in self._pages_under_tag:
+            md += "## " + tag.name + "\n\n"
+        # Render HTML using Python-Markdown
+        html = markdown.markdown(md, extensions=["toc"])
+        # Parse HTML. A tag is added as root to make it valid XML.
+        root = ElementTree.fromstring("<data>" + html + "</data>")
+        # Search for headers and their ids
+        tag_names_and_ids: Dict[str, str] = {}
+        for child in root:
+            if child.tag == "h2":
+                tag_names_and_ids[child.text] = child.attrib["id"]
+        for tag in self._pages_under_tag:
+            tag.header_id = tag_names_and_ids[tag.name]
+
+    def on_nav(
+        self, nav: nav.Navigation, config: config.Config, files: files.Files,
+    ) -> nav.Navigation:
+        """Reads tag and title info into `self.pages_under_tag`.
+
+        See base class for argument and return value info.
+        """
+        tag_page_title = self._collect_tags_and_pages_info(
+            nav=nav, config=config
+        )
+        self._sort_tags_and_pages()
+        self._set_header_ids(tag_page_title=tag_page_title)
         return nav
 
     def on_page_markdown(
@@ -208,32 +264,22 @@ class MkDocsTags(plugins.BasePlugin):
         See base class for argument and return value info.
         """
         # Generate the tag page
-        if page.file.src_path == self._tag_page_md_path:
+        md_abs_path = page.file.src_path
+        if md_abs_path == self._tag_page_md_path:
             jinja_tmplt = jinja2.Template(self._tag_page_tmplt)
             markdown = jinja_tmplt.render(
-                tags_and_pages=self._tags_and_pages,
+                pages_under_tag=self._pages_under_tag,
                 markdown=markdown,
                 page=page,
                 config=config,
             )
         # Generate on-page tag lists
-        if _TAGS_META_ENTRY not in page.meta:
-            return markdown
-        tag_names = page.meta[_TAGS_META_ENTRY]
-        tags: List[_TagInfo] = []
-        if not isinstance(tag_names, list):
-            return markdown
-        for tag_name in tag_names:
-            if not isinstance(tag_name, str):
-                continue
-            tag = _TagInfo(name=tag_name)
-            tags.append(tag)
         jinja_tmplt = jinja2.Template(self._on_page_tmplt)
         tag_page_md_rel_path = path.relpath(
-            path=self._tag_page_md_path, start=path.dirname(page.file.src_path)
+            path=self._tag_page_md_path, start=path.dirname(md_abs_path)
         )
         markdown = jinja_tmplt.render(
-            tags=tags,
+            tags=self._page_info_of_abs_path[md_abs_path].tags,
             markdown=markdown,
             page=page,
             config=config,
