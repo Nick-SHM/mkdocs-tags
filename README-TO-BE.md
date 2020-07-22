@@ -134,12 +134,16 @@ The template as a string. `on_page_tmplt_path` takes precedence over it.
 If neither `on_page_tmplt_path` nor `on_page_tmplt` is set, the default template is:
 
 ```jinja
-{{markdown}}
-{% if empty %}
+{% set links = [] %}
+{% for tag in tags %}
+{{ links.append('[' + tag.name + '](' + tag_page_md_rel_path +
+    '#' + tag.header_id + ')') or "" }}
+{% endfor %}
 
+{{ markdown }}
+{% if tags %}
 ---
-
-Tags: **{{ tags | join("**, **") }}**
+Tags: **{{ links | join('**, **')}}**
 {% endif %}
 ```
 
