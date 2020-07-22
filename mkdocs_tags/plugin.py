@@ -66,6 +66,14 @@ Tags: **{{ links | join('**, **')}}**
 
 
 class _TagInfo:
+    """Stores infomation about a tag.
+
+    Attributes:
+        name: the name of the tag
+        header_id: the HTML id of the section of the tag in the tag page. It
+          will be set in `_set_header_ids()`
+    """
+
     def __init__(self, name) -> None:
         self.name = name
         self.header_id = ""  # to be set in `_set_header_ids()`
@@ -81,6 +89,15 @@ class _TagInfo:
 
 
 class _PageInfo:
+    """Stores infomation about a page.
+
+    Attributes:
+        title: title of the page
+        abs_path: absolute path to the page
+        rel_path: path to the page relative to the tag page
+        tags: a `List[_TagInfo]` of tags of the page
+    """
+
     def __init__(self, page: pages.Page, tag_page_md_path: str) -> None:
         self.title: str = page.title
         self.abs_path = page.file.src_path
