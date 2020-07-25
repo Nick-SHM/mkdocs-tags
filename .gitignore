@@ -1,6 +1,7 @@
 .DS_Store
 
-tests
+demo_site
+test_site
 
 # ------------------------
 # GitHub Python gitignore:
