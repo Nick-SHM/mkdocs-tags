@@ -13,9 +13,9 @@
 # limitations under the License.
 """An MkDocs plugin for tags support
 
-This plugin reads tag info from the metadata section of each page,
-generate a list of tags on each page, and generate a tag page with a
-list of all tags and the pages under each of them.
+This plugin reads tag info from the metadata section of each page, generate a
+list of tags on each page, and generate a tag page with a list of all tags and
+the pages under each of them.
 
 Not intended for direct import.
 """
@@ -23,17 +23,15 @@ Not intended for direct import.
 from __future__ import annotations
 
 import copy
-import jinja2
-import markdown
 import operator
-from mkdocs import config
-from mkdocs.structure import files
-from mkdocs.structure import nav
-from mkdocs.structure import pages
-from mkdocs import plugins
 from os import path
 from typing import Dict, List
 from xml.etree import ElementTree
+
+import jinja2
+import markdown
+from mkdocs import config, plugins
+from mkdocs.structure import files, nav, pages
 
 _TAGS_META_ENTRY = "tags"
 _ON_PAGE_TMPLT_CFG_ENTRY = "on_page_tmplt"
@@ -42,6 +40,7 @@ _TAG_PAGE_TMPLT_CFG_ENTRY = "tag_page_tmplt"
 _TAG_PAGE_TMPLT_PATH_CFG_ENTRY = "tag_page_tmplt_path"
 _TAG_PAGE_MD_PATH_CFG_ENTRY = "tag_page_md_path"
 
+_DFT_TAG_PAGE_MD_PATH = "tags.md"
 _DFT_TAG_PAGE_TMPLT = """# {{page.title}}
 {% for tag in pages_under_tag %}
 ## {{tag.name}}
@@ -50,7 +49,6 @@ _DFT_TAG_PAGE_TMPLT = """# {{page.title}}
 {% endfor %}
 {% endfor %}
 """
-
 _DFT_ON_PAGE_TMPLT = """{% set links = [] %}
 {% for tag in tags %}
 {{ links.append('[' + tag.name + '](' + tag_page_md_rel_path +
@@ -74,18 +72,20 @@ class _TagInfo:
           will be set in `_set_header_ids()`
     """
 
-    def __init__(self, name) -> None:
+    def __init__(self, name: str) -> None:
         self.name = name
         self.header_id = ""  # to be set in `_set_header_ids()`
 
     def __hash__(self) -> int:
         return hash(self.name)
 
-    def __eq__(self, other: _TagInfo) -> bool:
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, _TagInfo):
+            return NotImplemented
         return self.name == other.name
 
-    def __ne__(self, other: _TagInfo) -> bool:
-        return not (self.name == other.name)
+    def __ne__(self, other: object) -> bool:
+        return not self.__eq__(other)
 
 
 class _PageInfo:
@@ -100,7 +100,7 @@ class _PageInfo:
 
     def __init__(self, page: pages.Page, tag_page_md_path: str) -> None:
         self.title: str = page.title
-        self.abs_path = page.file.src_path
+        self.abs_path: str = page.file.src_path
         self.rel_path = path.relpath(
             path=self.abs_path, start=path.dirname(tag_page_md_path)
         )
@@ -108,10 +108,9 @@ class _PageInfo:
         # to be set in `_collect_tags_and_pages_info()`
 
 
-class MkDocsTags(plugins.BasePlugin):
+class MkDocsTags(plugins.BasePlugin):  # type: ignore
+    # silence mypy error: Class cannot subclass 'BasePlugin' (has type 'Any')
     """An MkDocs plugin for tags support
-
-    Not intended for direct import.
 
     Attributes:
         config_scheme: see base class
@@ -136,7 +135,7 @@ class MkDocsTags(plugins.BasePlugin):
         ),
         (
             _TAG_PAGE_MD_PATH_CFG_ENTRY,
-            config.config_options.Type(str, default="tags.md"),
+            config.config_options.Type(str, default=_DFT_TAG_PAGE_MD_PATH),
         ),
     )
 
@@ -195,7 +194,7 @@ class MkDocsTags(plugins.BasePlugin):
             page_copy.read_source(config_copy)  # Read meta data
             # Collect the title of the tag page
             if page_copy.file.src_path == self._tag_page_md_path:
-                tag_page_title = page_copy.title
+                tag_page_title: str = page_copy.title
             # Collect tag and page info
             page_info = _PageInfo(
                 page=page_copy, tag_page_md_path=self._tag_page_md_path
@@ -220,7 +219,7 @@ class MkDocsTags(plugins.BasePlugin):
                 self._pages_under_tag[tag].append(page_info)
         return tag_page_title
 
-    def _sort_tags_and_pages(self):
+    def _sort_tags_and_pages(self) -> None:
         """Sorts the tags and pages info by their names and titles."""
         for tag in self._pages_under_tag:
             self._pages_under_tag[tag].sort(key=operator.attrgetter("title"))
@@ -231,7 +230,7 @@ class MkDocsTags(plugins.BasePlugin):
             )
         }
 
-    def _set_header_ids(self, tag_page_title):
+    def _set_header_ids(self, tag_page_title: str) -> None:
         """Sets the header ids of the tags on the tags page.
 
         Precondition: `self._tags_and_pages` has been sorted.
@@ -251,14 +250,15 @@ class MkDocsTags(plugins.BasePlugin):
         tag_names_and_ids: Dict[str, str] = {}
         for child in root:
             if child.tag == "h2":
-                tag_names_and_ids[child.text] = child.attrib["id"]
+                if isinstance(child.text, str):
+                    tag_names_and_ids[child.text] = child.attrib.get("id", "")
         for tag in self._pages_under_tag:
             tag.header_id = tag_names_and_ids[tag.name]
 
     def on_nav(
         self, nav: nav.Navigation, config: config.Config, files: files.Files,
     ) -> nav.Navigation:
-        """Reads tag and title info into `self.pages_under_tag`.
+        """Reads tag and title info into `self._pages_under_tag`.
 
         See base class for argument and return value info.
         """
