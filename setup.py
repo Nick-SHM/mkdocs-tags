@@ -39,7 +39,5 @@ with open(path.join(path.dirname(__file__), "README.md")) as readme:
         packages=setuptools.find_packages(),
         install_requires=["mkdocs"],
         python_requires=">=3.6",
-        entry_points={
-            "mkdocs.plugins": ["tags = mkdocs_tags.plugin:MkDocsTags"]
-        },
+        entry_points={"mkdocs.plugins": ["tags = mkdocs_tags:MkDocsTags"]},
     )
