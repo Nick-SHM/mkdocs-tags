@@ -1,5 +1,12 @@
 # Change Log
 
+## [1.0] - 2020-07-28
+
+### Changed
+
+-   Put back `README.md`
+-   Fix typos in `README.md`
+
 ## [0.4] - 2020-07-22
 
 ### Added
