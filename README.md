@@ -1,6 +1,6 @@
 # MkDocs Tags Plugin
 
-An [MkDocs](https://www.mkdocs.org) plugin for tags support.
+An [MkDocs](https://www.mkdocs.org) plugin that allows you to add tags to document pages.
 
 ## Installation
 
@@ -97,9 +97,9 @@ Variables available for the template include:
 
 A `Dict[_TagInfo, List[_PageInfo]]` containing tag and page info. Tags and pages are sorted lexicographically by their names and titles.
 
-`_TagInfo` class has attributes `name` and `header_id` (HTML `id` of the section of the tag on the tag page, without `#`).
+The `_TagInfo` class has attributes `name` and `header_id` (HTML `id` of the section of the tag on the tag page, without `#`).
 
-`_PageInfo` class has attributes `title`, `abs_path`, and `rel_path` (relative path to the tag page).
+The `_PageInfo` class has attributes `title`, `abs_path`, and `rel_path` (relative path to the tag page).
 
 ##### `markdown`
 
@@ -107,11 +107,11 @@ The markdown source of the page, in a `str`.
 
 ##### `page`
 
-The `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
+The `mkdocs.structure.pages.Page` object of the current page. For more info, see the [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and the [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py).
 
 ##### `config`
 
-The global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
+The global `mkdocs.config.base.Config` object of the site. For more info, see the[MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and the [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ### On-page Tag List
 
@@ -159,11 +159,11 @@ The markdown source of the page, in a `str`.
 
 ##### `page`
 
-The `mkdocs.structure.pages.Page` object of the current page. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
+The `mkdocs.structure.pages.Page` object of the current page. For more info, see the [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#page) and the [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/structure/pages.py). Not all the attributes of `page` is available when the plugin renders the page.
 
 ##### `config`
 
-The global `mkdocs.config.base.Config` object of the site. For more info, see [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
+The global `mkdocs.config.base.Config` object of the site. For more info, see the [MkDocs documentation](https://www.mkdocs.org/user-guide/custom-themes/#config) and the [MkDocs source code](https://github.com/mkdocs/mkdocs/blob/master/mkdocs/config/base.py).
 
 ## Changelog
 
