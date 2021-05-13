@@ -1,3 +1,5 @@
+# This project is no longer maintained. You may consider [this feature](https://squidfunk.github.io/mkdocs-material/setup/setting-up-tags/) of Material for MkDocs Insiders, which is paid, though.
+
 # MkDocs Tags Plugin
 
 An [MkDocs](https://www.mkdocs.org) plugin that allows you to add tags to document pages.
